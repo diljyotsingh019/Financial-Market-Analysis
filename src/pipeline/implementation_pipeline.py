@@ -9,7 +9,7 @@ finance = rag_finance(PINECONE_API, OPENAI_API_KEY)
 
 agent = finance.agent()
 
-agent.invoke("Which stocks are performing the best right now?")
+agent.invoke("Does IBM give out any dividends? If so, how much?")
 
 
 # database.delete_records()

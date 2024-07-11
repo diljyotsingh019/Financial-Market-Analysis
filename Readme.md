@@ -4,11 +4,7 @@ Develop an advanced Retrieval-Augmented Generation (RAG) agent designed to assis
 
 
 
-
-
-
-
-### Linux
+### Linux Installation
 Create a virtual environment
 ```sh
 virtualenv --python python3.10 rag-agent

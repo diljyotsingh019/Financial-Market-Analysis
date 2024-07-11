@@ -54,7 +54,7 @@ class MarketNews(BaseTool):
         raise NotImplementedError("This tool doesn't support async")
 
 class CompanyDividends(BaseTool):
-    name = "Company Overview"
+    name = "Company Dividends"
     description = "Use the entire user query to get the dividends for a particular company from this tool. This tool returns a JSON object"
 
     def _run(self, query):
@@ -71,7 +71,7 @@ class CompanyDividends(BaseTool):
         Don't explain anything just give me the json output.
         """
         result = ai.invoke(prompt)
-        result = json.loads(str(result[7:-3]))
+        result = json.loads(result.content[7:-3])
         collection = data_collection(ALPHA_API)
         dividends = collection.company_dividends(result["stock_name"])
         return dividends
@@ -104,13 +104,16 @@ class CompanyOverview(BaseTool):
         return overview
     
 class GainerLosers(BaseTool):
-    name = "Company Overview"
-    description = "Use the entire user query to get the top gainers and losers in the market from this tool. This tool returns a JSON object"
+    name = "Gainers and Losers"
+    description = "Use this tool to get the top gainers and losers in the market. This tool returns a JSON object"
 
-    def _run(self):
+    def _run(self, query: str):
         collection = data_collection(ALPHA_API)
         gl = collection.gainers_losers()
         return gl
+    
+    def _arun(self):
+        raise NotImplementedError("This tool doesn't support async")
 
 
 class rag_finance:
