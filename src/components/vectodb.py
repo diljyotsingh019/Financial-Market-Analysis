@@ -6,8 +6,6 @@ import torch
 
 collection = data_collection(ALPHA_API)
 
-# print(collection.gainers_losers())
-
 class Database:
     def __init__(self, api_key):
         self.api_key = api_key
@@ -27,6 +25,9 @@ class Database:
                 "metadata" : {"URL":i["url"], "context": text}    
             })
         self.index.upsert(upserts)
+
+    def delete_records(self):
+        self.index.delete(delete_all=True)
 
 
 
