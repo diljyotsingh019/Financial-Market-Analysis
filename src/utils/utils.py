@@ -1,7 +1,8 @@
 from components.vectodb import Database
 from utils.config import *
 from langchain.tools import BaseTool
-from langchain.agents import initialize_agent
+from langchain.agents import AgentExecutor, create_react_agent
+from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings # Used for converting retrieval queries into dense vector embeddings
 from langchain_openai import ChatOpenAI # Used for text generation
 from langchain.chains import RetrievalQA # Used for creating a RAG pipeline
@@ -14,8 +15,8 @@ from components.data_collection import data_collection
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 class MarketNews(BaseTool):
-    name = "Market News"
-    description = "Use the entire user query to get the Financial market news from this tool. This tool returns a string"
+    name = "MarketNews"
+    description = "You must use the entire user query to get the Financial market news from this tool. This tool returns a JSON object"
 
     def _run(self, query):
         ai = ChatOpenAI(model = "gpt-4o", temperature=0)
@@ -36,7 +37,7 @@ class MarketNews(BaseTool):
         Mention only one topic and don't give me a topic list, just give me just a string.
         """
         result = ai.invoke(prompt)
-        result = json.loads(str(result[7:-3]))
+        result = json.loads(result.content[7:-3])
         database = Database(PINECONE_API)
         database.upsert(result["stock_name"], result["topic"])
         pinecone = Pinecone(PINECONE_API)
@@ -54,8 +55,8 @@ class MarketNews(BaseTool):
         raise NotImplementedError("This tool doesn't support async")
 
 class CompanyDividends(BaseTool):
-    name = "Company Dividends"
-    description = "Use the entire user query to get the dividends for a particular company from this tool. This tool returns a JSON object"
+    name = "CompanyDividends"
+    description = "You must use the entire user query to get the dividends for a particular company from this tool. This tool returns a JSON object"
 
     def _run(self, query):
         ai = ChatOpenAI(model = "gpt-4o", temperature=0)
@@ -80,8 +81,8 @@ class CompanyDividends(BaseTool):
         raise NotImplementedError("This tool doesn't support async")
 
 class CompanyOverview(BaseTool):
-    name = "Company Overview"
-    description = "Use the entire user query to get an overview for a particular company from this tool. This tool returns a JSON object"
+    name = "CompanyOverview"
+    description = "You must use the entire user query to get an overview for a particular company from this tool. This tool returns a JSON object"
 
     def _run(self, query):
         ai = ChatOpenAI(model = "gpt-4o", temperature=0)
@@ -104,8 +105,8 @@ class CompanyOverview(BaseTool):
         return overview
     
 class GainerLosers(BaseTool):
-    name = "Gainers and Losers"
-    description = "Use this tool to get the top gainers and losers in the market. This tool returns a JSON object"
+    name = "GainersLosers"
+    description = "You must use this tool to get the top gainers and losers in the market. This tool returns a JSON object"
 
     def _run(self, query: str):
         collection = data_collection(ALPHA_API)
@@ -125,9 +126,43 @@ class rag_finance:
     def agent(self):
         tools = [MarketNews(), GainerLosers(), CompanyDividends(), CompanyOverview()]
         llm = ChatOpenAI(model = "gpt-4o", temperature=0)
-        finance_agent = initialize_agent(tools = tools,
-                                         llm = llm,
-                                         verbose = True, 
-                                         max_iteration = 5
+        prompt= PromptTemplate(input_variables=['agent_scratchpad', 'input', 'tool_names', 'tools'], 
+                            template="""
+                            You are very powerful assistant, that utilizes the tools to answer user queries.
+                            Use the entire user query to get the result from the tool.
+                                You output the tool's results as well answer the user query. You give the output in the JSON format 
+                                JSON output format -
+                                ```json 
+                                1. tool_output:
+                                2. tool_name
+                                3. answer:
+                                ```
+                                While returning the json output make sure to prefix and end with - ```json and ```
+
+                                
+                            Answer the following questions as best you can. You have access to the following tools:
+                            {tools}
+
+                            Use the following format:
+                            
+                            Question: the input question you must answer
+                            Thought: you should always think about what to do
+                            Action: the action to take, should be one of [{tool_names}]
+                            Action Input: the input to the action
+                            Observation: the result of the action
+                            Thought: I now know the final answer
+                            Action: Return the final answer back to the user
+                            Final Answer: the final answer to the original input question
+                            
+                            Begin!
+                            
+                            Question: {input}
+                            Thought:{agent_scratchpad}""")
+        finance_agent = create_react_agent(tools = tools,
+                                         llm = llm, 
+                                         prompt = prompt
                                         )
-        return finance_agent
+        agent_executor = AgentExecutor(
+                                agent=finance_agent, tools=tools, verbose=True, handle_parsing_errors=True
+                            )
+        return agent_executor
