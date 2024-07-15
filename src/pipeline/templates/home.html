@@ -1,0 +1,49 @@
+  
+  <!-- 
+NAME @: Diljyot Singh
+TOPIC @: ARS
+DATE @: 7th June 2024
+-->
+
+  
+  <!-----------------------------  BASE SECTION  ----------------------------------->
+
+  {% extends "base.html"%}
+
+  <!-------------------------------------------------------------------------------->
+
+{% block content %}
+
+
+ 
+  <!---------------------------  HOME BODY SECTION   ------------------------------>
+
+<!-- Add a background color and large text to the whole page -->
+<body>
+  <h2 align = "center"><b>ABOUT THE PROJECT</b></h2><br>
+  
+  <p>An advanced Retrieval-Augmented Generation (RAG) agent designed to assist financial analysts by retrieving and summarizing relevant financial market data and news articles. This agent will fetch information from a large database of financial news and reports, providing concise summaries and insights to aid in investment decision-making.</p>
+  
+  
+    <!-----------------------------  FORM SECTION  ----------------------------------->
+    
+  
+    <!----------------------------------------------------------------------------->
+  <div style = "background-color: white; border: 5px solid;">
+  <form align = "center" method="POST" enctype=multipart/form-data>
+      <br>
+      <label for = "askai">Ask AI about Finance insights: </label>
+      <input type = "text" id ="askai" 
+      placeholder = "Ask AI" required>
+      <br><br>
+  
+      <input type = "reset" style = "background-color: black; color: white;">
+      <input type = "submit" Value = "Submit" style = "background-color: black; color: white;">
+  </form>
+  <br>
+  </div>
+  
+  </body>
+{% endblock %}
+
+  <!-----------------------------  THE END  ----------------------------------->

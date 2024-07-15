@@ -4,23 +4,23 @@ Develop an advanced Retrieval-Augmented Generation (RAG) agent designed to assis
 
 
 
-### Linux Installation
-Create a virtual environment
+### Linux Installation Steps
+1. Create a virtual environment
 ```sh
 virtualenv --python python3.10 rag-agent
 ```
 
-Activate the enivronment
+2. Activate the enivronment
 ```sh
 source rag-agent/bin/activate
 ```
 
-Install the dependencies
+3. Install the dependencies
 ```sh
 pip install -r requirements.txt
 ```
 
-Change the query and execute the python script
+4. Change the query and execute the python script
 ```sh
 python3 src/pipeline/implementation_pipeline.py
 ```
