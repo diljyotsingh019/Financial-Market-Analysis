@@ -23,7 +23,6 @@ class MarketNews(BaseTool):
     description = "You must use the entire user input to get the Financial market news from this tool"
 
     def _run(self, query):
-        print(query)
         ai = ChatOpenAI(model = "gpt-4o", temperature=0)
         prompt = f"""
         Based on the query provided below, give me the topics and the name of the stock (eg - AAPL).
@@ -151,14 +150,15 @@ class GainerLosers(BaseTool):
 
 class handler(BaseCallbackHandler):
     def __init__(self):
-        self.log_entries = []
+        self.log_actions = []
+        self.log_finishes = []
     
     def on_agent_action(self, action: AgentAction, *, run_id: UUID, parent_run_id: UUID | None = None, **kwargs: Any) -> Any:
-        self.log_entries.append({"Action": action})
+        self.log_actions.append({"Action": action})
         return super().on_agent_action(action, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
     
     def on_agent_finish(self, finish: AgentFinish, *, run_id: UUID, parent_run_id: UUID | None = None, **kwargs: Any) -> Any:
-        self.log_entries.append({"Finish": finish})
+        self.log_finishes.append({"Finish": finish})
         return super().on_agent_finish(finish, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
 
@@ -168,7 +168,7 @@ class rag_finance:
         self.index = self.pinecone.Index("financial-market-summarization")
         os.environ["OPENAI_API_KEY"] = openai_api_key
 
-    def agent(self):
+    def agent(self, handler):
         tools = [MarketNews(), GainerLosers(), CompanyDividends(), CompanyOverview()]
         llm = ChatOpenAI(model = "gpt-4o", temperature=0)
         react_prompt = PromptTemplate(input_variables=['agent_scratchpad', 'input', 'tool_names', 'tools'], 
@@ -201,7 +201,9 @@ class rag_finance:
                                          prompt = react_prompt
                                         )
         agent_executor = AgentExecutor(
-                                agent=finance_agent, tools=tools, verbose=True, handle_parsing_errors=True
+                                agent=finance_agent, tools=tools, verbose=True, 
+                                handle_parsing_errors=True, max_iterations= 15,
+                                callbacks = [handler]
                             )
         return agent_executor
     

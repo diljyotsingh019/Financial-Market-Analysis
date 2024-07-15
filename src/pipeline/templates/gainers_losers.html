@@ -33,14 +33,30 @@ DATE @: 14th July 2024
 <form align = "center" method="POST" enctype=multipart/form-data>
     <br>
     <label for = "askai">Ask AI about Finance insights: </label>
-    <input type = "text" id ="askai" 
-    placeholder = "Ask AI" required>
+    <input type = "text" id ="askai" name = "askai" placeholder = "Ask AI" required>
     <br><br>
 
     <input type = "reset" style = "background-color: black; color: white;">
     <input type = "submit" Value = "Submit" style = "background-color: black; color: white;">
 </form>
 <br>
+<p><b>Finance AI: </b>{{response}}</p>
+<div align = "center">
+  <h3><b>Additional Information:</b></h3>
+  <br>
+  <p>Top {{data.top_gainers|length}} Gainers -></p>
+  {% for item in data.top_gainers %}
+  <p>Stock: {{item.ticker}}  Price: {{item.price}}  Change Amount: {{item.change_amount}}  Change Percentage:{{item.change_percentage}}   Volume: {{item.volume}}</p><br>
+  {% endfor %}
+  <p>Top {{data.top_gainers|length}} Losers -></p>
+  {% for item in data.top_gainers %}
+  <p>Stock: {{item.ticker}}  Price: {{item.price}}  Change Amount: {{item.change_amount}}  Change Percentage:{{item.change_percentage}}   Volume: {{item.volume}}</p><br>
+  {% endfor %}
+  <p>Most Actively Traded stocks -></p>
+  {% for item in data.top_gainers %}
+  <p>Stock: {{item.ticker}}  Price: {{item.price}}  Change Amount: {{item.change_amount}}  Change Percentage:{{item.change_percentage}}   Volume: {{item.volume}}</p><br>
+  {% endfor %}
+</div>
 </div>
 
 </body>
