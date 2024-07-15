@@ -20,7 +20,7 @@ source rag-agent/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Change the query and execute the python script
+4. Execute the python script and open the flask UI on a web browser (Hosted Locally) 
 ```sh
 python3 src/pipeline/implementation_pipeline.py
 ```
