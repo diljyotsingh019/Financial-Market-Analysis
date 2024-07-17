@@ -7,3 +7,5 @@
 /src/exception/
 /test/
 /src/utils/__pycache__/
+/logs/
+/src/logger/__pycache__/
