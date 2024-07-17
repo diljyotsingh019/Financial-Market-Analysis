@@ -3,10 +3,13 @@ from components.data_collection import * # Used to collect data
 from utils.config import * # Used to config API keys
 from utils.utils import rag_finance, handler # Used to create an agent and the callback handler
 import json # Used to perform json
+from logger.logging import log_setup # Used to setup logging
 from langchain_openai import ChatOpenAI # Used for Natural Language generation
 from flask import Flask, redirect, url_for, render_template, request # Used to create Web UI
 import os # Used for os operations
 
+logger = log_setup("main", LOGFILE) #Initialising logger object to start logging
+logger.debug("[START] - Session Started...")
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY # Creating an os environment to authenticate GPT models
 
 app = Flask(__name__)
@@ -21,6 +24,7 @@ def home():
     if request.method == "POST": # Checking if a query has been submitted or not
         global query
         query = request.form["askai"] # Creating a global query object
+        logger.debug(f"[QUERY] - {query}") # Logging the query
         return redirect(url_for("agent"))
     else:
         return render_template("home.html")
@@ -36,17 +40,20 @@ def agent():
     global query
     if request.method == "POST": # Checking if there's a new user query on the UI
         query = request.form["askai"] # Changing the global query object to the new query
+        logger.debug(f"[QUERY] - {query}") #Logging the query
         return redirect(url_for("agent"))
     else:
         try:
             database = Database(PINECONE_API) # Creating a database object for deleting the records
             database.delete_records() # Deleting the records
+            logger.debug("[DATABASE CLEARED]") # Logging deletion
         except:
             pass 
         callback_handler = handler() # Creating a handler for logging agent actions
         finance = rag_finance(PINECONE_API, OPENAI_API_KEY) # Creating a rag_finance object to create an agent
         agent = finance.agent(callback_handler) # Creating a RAG agent
         agent_result = agent.invoke({"input": query}) # Answering the user query
+        logger.debug(f"[AI Response] - {agent_result['output']}") # Logging Agent response
         if not callback_handler.log_actions: # If the Agent doesn't require any tools to respond (Non-Financial Queries)
             return render_template("home.html") # Render initial Web UI
         else:      
@@ -71,6 +78,7 @@ def agent():
                 "MarketNews": ["market_news.html", ""]} # Rendering different webpages based on agent's last action
             
             data = actions[callback_handler.log_actions[-1]["Action"].tool][1] # Gather data from the API based on agent's last action
+            logger.debug(f"[AI Actions] - {str(callback_handler.log_actions)}") # Logging Agent actions
             return render_template(actions[callback_handler.log_actions[-1]["Action"].tool][0], data = data, response = agent_result["output"], query = query)
 
 
