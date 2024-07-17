@@ -39,12 +39,13 @@ DATE @: 14th July 2024
     <input type = "submit" Value = "Submit" style = "background-color: black; color: white;">
 </form>
 <br>
+<p><b>Query: </b>{{query}}</p>
 <p><b>Finance AI: </b>{{response}}</p>
 <div align = "center">
   <h3><b>Additional Information:</b></h3>
-  <p>Company: {{company}}</p>
-  <p>Last {{ data| length }} dividends -></p>
-  {% for item in data %}
+  <p>Company: {{data.symbol}}</p>
+  <p>Last {{data.data|length}} dividends -></p>
+  {% for item in data.data %}
   <p>Date: {{item.ex_dividend_date}}   Amount: {{item.amount}}</p><br>
   {% endfor %}
   </div>
