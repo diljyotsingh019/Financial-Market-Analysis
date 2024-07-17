@@ -1,0 +1,9 @@
+/rag-agent/
+/src/components/__pycache__/
+/src/financial_agent.egg-info/
+/windows/
+/experiment/
+/src/exception/
+/test/
+/src/utils/__pycache__/
+/src/logger/__pycache__/
