@@ -36,4 +36,7 @@ python3 src/pipeline/implementation_pipeline.py
 2. Containerization (Docker)
 3. Testing 
 
- 
+## Examples:
+ ![dividends_example](https://github.com/user-attachments/assets/8e98b55d-1081-448a-bb44-1a44a6984564)
+![gainer_losers](https://github.com/user-attachments/assets/cb78da3e-bb6c-4bd1-aa06-91e8782205de)
+![market_news](https://github.com/user-attachments/assets/5fc763c4-d3d6-4423-88a7-3dcb640046c9)
